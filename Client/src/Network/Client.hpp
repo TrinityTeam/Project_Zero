@@ -6,7 +6,7 @@
 
 class Client {
 public:
-    void run();
+    void start();
 
 private:
     void connect(const sf::IpAddress& address);

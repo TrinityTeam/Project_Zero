@@ -10,30 +10,41 @@ buildDir = os.path.abspath("bin")
 cmakeOptions = ""
 makeOptions = ""
 
+
+def setCMakeOptions(args_iter):
+    cmakeOptions = next(args_iter)
+
+def setMakeOptions(args_iter):
+    makeOptions = next(args_iter)
+
+def setBuildDir(args_iter):
+    buildDir = os.path.abspath(next(args_iter))
+
+def printHelp():
+    print("Options:\n\
+           -c --cmake-options OPTIONS\tSet CMake build options\n\
+           -m --make-options OPTIONS\tSet Make build options\n\
+           -b --bin-dir DIR\tSet output directory\n")
+
+commands = {
+    "-c": setCMakeOptions, "--cmake-options": setCMakeOptions,
+    "-m": setMakeOptions, "--make-options": setMakeOptions,
+    "-b": setBuildDir, "--build-dir": setBuildDir,
+    "-h": printHelp
+}
+
 current = iter(sys.argv)
 next(current)
 try:
     while True:
         arg = next(current)
-        if arg == "-c" or arg == "--cmake-options":
-            cmakeOptions = next(current)
-
-        elif arg == "-m" or arg == "--make-options":
-            makeOpions = next(current)
-
-        elif arg == "-b" or arg == "--bin-dir":
-            buildDir = os.path.abspath(next(current))
-
-        elif arg == "-h" or arg == "--help":
-            print("Options:\n\
-                   -c --cmake-options OPTIONS\tSet CMake build options\n\
-                   -m --make-options OPTIONS\tSet Make build options\n\
-                   -b --bin-dir DIR\tSet output directory\n\
-                   -d -data-dir DIR\t Set data directory\n")
+        if arg in commands:
+            commands[arg](current)
+        else:
+            print("Invalid argument: ", arg)
 
 except StopIteration:
     pass
-
 
 
 

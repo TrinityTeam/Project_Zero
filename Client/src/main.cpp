@@ -1,15 +1,8 @@
-#include "Client.hpp"
-#include <iostream>
+#include "Network/Client.hpp"
 
 
 
 int main() {
-    try {
-        Client {}.run();
-        
-    } catch(std::exception& e) {
-        std::cout << e.what() << '\n';
-    }
-
+    Client().start();
     return 0;
 }

@@ -8,7 +8,7 @@
 
 
 
-void Client::run() {
+void Client::start() {
     connect("127.0.0.1");
     socket.setBlocking(false);
 

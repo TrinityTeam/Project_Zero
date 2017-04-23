@@ -1,13 +1,8 @@
-#include "Server.hpp"
-#include <iostream>
+#include "Network/Server.hpp"
 
 
 
 int main() {
-    try {
-        Server{}.start();
-
-    } catch(std::exception& e) {
-        std::cout << e.what() << '\n';
-    }
+    Server().start();
+    return 0;
 }

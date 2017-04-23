@@ -1,7 +1,7 @@
 project(GameClient)
 cmake_minimum_required(VERSION 2.8)
 
-set(SOURCES main Client)
+set(SOURCES main Network/Client)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../../cmake)
 find_package(SFML 2.4 REQUIRED system window graphics network audio)
