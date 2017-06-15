@@ -4,7 +4,7 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
-#include "Utility/ExceptionSafeWrapper.hpp"
+#include "Core/ExceptionSafeWrapper.hpp"
 
 
 
@@ -13,8 +13,17 @@ void Server::start() {
         throw std::runtime_error {"Error: unable to listen port 53000"};
     }
     sockets.add(listener);
-    while(true) {
-        if(sockets.wait()) {
+    sf::Clock clock;
+    while (true) {
+        sf::Time elapsed = clock.restart();
+        if(elapsed > sf::seconds(1)) {
+            int direction = rand()%4;
+            sf::Packet packet;
+            packet << direction;
+            std::cout << "Sending " << direction << "\n";
+            sendBroadcastMessage(packet);
+        }
+        if(sockets.wait(sf::seconds(1))) {
             if(sockets.isReady(listener)) {
                 acceptConnection();
             } else {

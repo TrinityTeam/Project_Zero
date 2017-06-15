@@ -1,5 +1,5 @@
 #include "Client.hpp"
-#include "Utility/ExceptionSafeWrapper.hpp"
+#include "Core/ExceptionSafeWrapper.hpp"
 #include <SFML/Network.hpp>
 #include <stdexcept>
 #include <iostream>
@@ -9,6 +9,7 @@
 
 
 void Client::start() {
+    shouldStop = false;
     connect("127.0.0.1");
     socket.setBlocking(false);
 
@@ -17,7 +18,7 @@ void Client::start() {
     std::thread inputThread(make_exception_safe([this]()->void{receiveLoop();}, exceptions, exceptionsMutex));
     inputThread.detach();
 
-    while(true) {
+    /*while(true) {
         if(not exceptions.empty()) {
             std::rethrow_exception(exceptions.front());
         }
@@ -26,7 +27,30 @@ void Client::start() {
             sendMessage(message);
         }
     }
-    std::cout << "Quiting\n";
+    std::cout << "Quiting\n";*/
+}
+
+
+
+void Client::stop() {
+    shouldStop = true;
+}
+
+
+
+Client::~Client() {
+    stop();
+}
+
+
+sf::Packet Client::getMessage() {
+    if(not incomings.empty()) {
+        auto message = incomings.front();
+        incomings.pop();
+        return message;
+    } else {
+        return sf::Packet();
+    }
 }
 
 
@@ -47,15 +71,14 @@ void Client::connect(const sf::IpAddress& address) {
 
 void Client::receiveLoop() {
     std::string message;
-    do {
-        message = receiveMessage();
-
-    } while(message != "exit");
+    while(not shouldStop) {
+        receiveMessage();
+    }
 }
 
 
 
-std::string Client::receiveMessage() {
+void Client::receiveMessage() {
     sf::Socket::Status status;
     sf::IpAddress address;
     sf::Packet packet;
@@ -66,11 +89,8 @@ std::string Client::receiveMessage() {
     }
     switch(status) {
     case sf::Socket::Done:{
-        std::string message;
-        packet >> message;
-        std::lock_guard<std::mutex> coutLock(coutMutex);
-        std::cout << "Received " << message << "\n";
-        return message;
+        std::cout << "Received a message\n";
+        incomings.push(packet);
     }
     case sf::Socket::NotReady:
         break;
@@ -86,7 +106,6 @@ std::string Client::receiveMessage() {
     default:
         throw std::runtime_error {"Error receiving data"};   
     }
-    return "";
 }
 
 
